@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->double('bobot');
-            $table->string('deskripsi');
+            $table->string('deskripsi')->nullable();
+            $table->string('jenis')->nullable();
+            $table->timestamps();
         });
     }
 
