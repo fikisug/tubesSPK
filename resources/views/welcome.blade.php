@@ -244,7 +244,7 @@
                     
                     document.querySelector('#alternatifTable thead tr').innerHTML='<th>Nama</th> <th>Deskripsi</th>';
                     
-                fetch('{{ route("getCriteria") }}')
+                fetch('{{ route("getCriteriaa") }}')
                     .then(response => response.json())
                     .then(criteriaNames => {
                         const criteriaTable = document.getElementById('alternatifTable');
@@ -270,7 +270,7 @@
                         <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md"></td>
                         `;
                         
-                        fetch('{{ route("getCriteria") }}')
+                        fetch('{{ route("getCriteriaa") }}')
                         .then(response => response.json())
                         .then(criteriaNames => {
                             criteriaNames.forEach(name => {
@@ -313,6 +313,54 @@
 
         $.ajax({
                 type: "GET",
+                url: '{{ route('getScore') }}', // Ganti dengan endpoint yang sesuai
+                success: function (response) {
+                    // Loop melalui data criteria dan tambahkan ke dalam tabel
+                    response.criteria.forEach(function (item) {
+                        $('#alternatifTable thead tr').append(`                            
+                                <th>${item.nama}</th>                            
+                        `);
+                    });
+
+                    response.alternatif.forEach(function (item) {
+                        var criteriaNumberInput = document.getElementById("criteriaNumber");
+                        criteriaNumberInput.disabled = true;
+                        $('#alternatifTable tbody').append(`
+                            <tr>
+                                <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
+                                <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md value="${item.deskripsi}""></td>
+                            
+                        `);
+                        
+                $.ajax({
+                    type: "GET",
+                    url: '{{  url('getscoree') }}' + '/' + item.nama,
+                    success: function (response) {
+                        response.score.forEach(function (item) {
+                        $('#alternatifTable thead tr').append(`                            
+                                <th>${item.nama}</th>                            
+                        `);
+                    });
+                    }
+                });
+                        
+                    });
+
+                    // response.score.forEach(function (item) {                        
+                    //     $('#alternatifTable tbody tr').append(`
+                            
+                    //             <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" data-criteria="${item.score}"></td>
+                            
+                    //     `);
+                    // });
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        
+        $.ajax({
+                type: "GET",
                 url: '{{ route('getCriteria') }}', // Ganti dengan endpoint yang sesuai
                 success: function (response) {
                     // Loop melalui data criteria dan tambahkan ke dalam tabel
@@ -351,7 +399,7 @@
                     nama: $(this).find('input[name="nama"]').val(),
                     bobot: $(this).find('input[name="bobot"]').val(),
                     deskripsi: $(this).find('input[name="deskripsi"]').val(),
-                    jenis: $(this).find('input[name^="C"]:checked').val(),
+                    jenis: $(this).find('input[name^="C"]:checked').val() || 3,
                 };
                 formData.criteriaData.push(rowData);
             });

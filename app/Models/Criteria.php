@@ -11,5 +11,5 @@ class Criteria extends Model
 
     protected $table = 'criteria';
 
-    protected $fillable = ['nama', 'bobot', 'deskripsi'];
+    protected $fillable = ['nama', 'bobot', 'deskripsi', 'jenis'];
 }

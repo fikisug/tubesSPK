@@ -25,7 +25,7 @@ class CriteriaController extends Controller
         $criteriaNumber = $request->input('criteriaNumber');
         $criteriaData = $request->input('criteriaData');
 
-        // dd($criteriaData);
+        // dd($criteriaData[0]['nama']);
 
         // Save the criteria data to the database
         foreach ($criteriaData as $data) {
@@ -56,8 +56,6 @@ class CriteriaController extends Controller
         $alternatifNumber = $request->input('alternatifNumber');
         $alternatifData = $request->input('alternatifData');
         
-        dd($alternatifData);
-
         // Loop through alternatifData and save to the database
         foreach ($alternatifData as $alternatifDatum) {
             $alternatif = Alternatif::create([
@@ -85,5 +83,28 @@ class CriteriaController extends Controller
         $criteriaNames = Criteria::all()->toArray();
         // dd($criteriaNames);
         return response()->json(['criteriaNames' => $criteriaNames]);
+    }
+
+    public function getCriteriaa()
+    {
+        $criteriaNames = Criteria::all()->pluck('nama')->toArray();
+        // dd($criteriaNames);
+        return response()->json($criteriaNames);
+    }
+
+    public function getScore()
+    {
+        $alternatif = Alternatif::all()->toArray();
+        $score = Score::all()->toArray();
+        $criteria = Criteria::all()->toArray();
+        // dd($score);
+        return response()->json(['score' => $score, 'alternatif' => $alternatif, 'criteria' => $criteria]);
+    }
+
+    public function getScoree($alternatif)
+    {
+        $score = Score::all()->where('alternatif', $alternatif)->toArray();
+        // dd($score);
+        return response()->json(['score' => $score]);
     }
 }

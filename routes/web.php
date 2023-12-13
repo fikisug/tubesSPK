@@ -24,3 +24,8 @@ Route::post('/add-alternatif', [CriteriaController::class, 'addAlternatif'])->na
 
 Route::get('/criteria-names', [CriteriaController::class, 'getCriteria'])->name('getCriteria');
 
+Route::get('/criteria-nama', [CriteriaController::class, 'getCriteriaa'])->name('getCriteriaa');
+
+Route::get('/score', [CriteriaController::class, 'getScore'])->name('getScore');
+Route::get('/scoree/{alternatif}', [CriteriaController::class, 'getScoree'])->name('getScoree');
+
