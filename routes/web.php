@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CriteriaController;
+use App\Http\Controllers\HasilController;
+use App\Http\Controllers\MooraController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,3 +31,5 @@ Route::get('/criteria-nama', [CriteriaController::class, 'getCriteriaa'])->name(
 Route::get('/score', [CriteriaController::class, 'getScore'])->name('getScore');
 Route::get('/scoree/{alternatif}', [CriteriaController::class, 'getScoree'])->name('getScoree');
 
+// Route::resource('hasil', HasilController::class);
+Route::get('/hasil', [HasilController::class, 'index'])->name('normalisasi');
