@@ -13,7 +13,7 @@ class CriteriaController extends Controller
     {
         // Validate the request
         $request->validate([
-            'criteriaNumber' => 'required|integer|min:1',
+            'criteriaNumber' => 'required|integer',
             'criteriaData' => 'required|array',
             'criteriaData.*.nama' => 'required|string',
             'criteriaData.*.bobot' => 'required|numeric',
@@ -28,24 +28,31 @@ class CriteriaController extends Controller
         // dd($criteriaData[0]['nama']);
 
         // Save the criteria data to the database
+        $totalBobot = 0;
         foreach ($criteriaData as $data) {
-            Criteria::create([
-                'nama' => $data['nama'],
-                'bobot' => $data['bobot'],
-                'deskripsi' => $data['deskripsi'],
-                'jenis' => $data['jenis'],
-            ]);
+            $totalBobot += $data['bobot'];
         }
-
-        // You can return a response if needed
-        return response()->json(['message' => 'Criteria saved successfully']);
+        if($totalBobot == 1){
+            Criteria::truncate();
+            foreach ($criteriaData as $data) {
+                Criteria::create([
+                    'nama' => $data['nama'],
+                    'bobot' => $data['bobot'],
+                    'deskripsi' => $data['deskripsi'],
+                    'jenis' => $data['jenis'],
+                ]);
+            }
+            return response()->json(['message' => 'Criteria saved successfully']);
+        }else{
+            return response()->json(['message' => 'Gagal Menyimpan Criteria']);
+        }
     }
 
     public function addAlternatif(Request $request)
     {
         // Validate the request
         $request->validate([
-            'alternatifNumber' => 'required|integer|min:1',
+            'alternatifNumber' => 'required|integer',
             'alternatifData' => 'required|array',
             'alternatifData.*.nama2' => 'required|string',
             'alternatifData.*.score' => 'numeric',
@@ -55,12 +62,21 @@ class CriteriaController extends Controller
         // Get the form data
         $alternatifNumber = $request->input('alternatifNumber');
         $alternatifData = $request->input('alternatifData');
+
+        $total = count($alternatifData);
+
+        if($total > 0){
+            Alternatif::truncate();
+            Score::truncate();
+        }else{
+            
+        }
         
         // Loop through alternatifData and save to the database
         foreach ($alternatifData as $alternatifDatum) {
             $alternatif = Alternatif::create([
                 'nama' => $alternatifDatum['nama2'],
-                'deskripsi' => $alternatifDatum['deskripsi2'],
+                'deskripsi' => $alternatifDatum['deskripsi2'] ?? '',
             ]);
     
             // Loop through scores and save to the database
@@ -97,8 +113,9 @@ class CriteriaController extends Controller
         $alternatif = Alternatif::all()->toArray();
         $score = Score::all()->toArray();
         $criteria = Criteria::all()->toArray();
-        // dd($score);
-        return response()->json(['score' => $score, 'alternatif' => $alternatif, 'criteria' => $criteria]);
+        $countScore = count($score);
+        
+        return response()->json(['score' => $score, 'alternatif' => $alternatif, 'criteria' => $criteria, 'countScore' => $countScore]);
     }
 
     public function getScoree($alternatif)

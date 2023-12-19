@@ -119,7 +119,7 @@
                         <div id="modalAlternatif" class="fixed inset-0 z-50 hidden overflow-auto bg-gray-800 bg-opacity-50">
                             <div class="flex items-center justify-center min-h-screen">
                               <!-- Modal Content -->
-                              <div class="bg-white w-96 p-6 rounded shadow-lg">
+                              <div class="bg-white w-max p-6 rounded shadow-lg">
                                 <h1 class="text-2xl font-semibold mb-4">Input Alternatif dan Score</h1>
                       
                                 <!-- Input Number for Criteria -->
@@ -215,16 +215,46 @@
                 </div>
             </div>
         </div>
-
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <script>
             // JavaScript to handle modal functionality
             document.getElementById('openModalCriteria').addEventListener('click', function() {
               document.getElementById('modalCriteria').classList.remove('hidden');
+              document.getElementById('criteriaNumber').value = 0;
+              document.getElementById('criteriaTable').classList.add('hidden');
+
+              $.ajax({
+                type: "GET",
+                url: '{{ route('getCriteria') }}', // Ganti dengan endpoint yang sesuai
+                success: function (response) {
+                    // Loop melalui data criteria dan tambahkan ke dalam tabel
+                    response.criteriaNames.forEach(function (item) {
+                        var criteriaNumberInput = document.getElementById("criteriaNumber");
+                        criteriaNumberInput.disabled = true;
+                        document.getElementById('criteriaTable').classList.remove('hidden');
+                        $('#criteriaTable tbody').append(`
+                            <tr>
+                                <td><input type="text" name="nama" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
+                                <td><input type="text" name="bobot" class="w-full px-3 py-2 border rounded-md" value="${item.bobot}"></td>
+                                <td><input type="text" name="deskripsi" class="w-full px-3 py-2 border rounded-md" value="${item.deskripsi !== null ? item.deskripsi : ''}"></td>
+                                <td><center><input type="radio" class="form-radio" name="${item.nama}" value="0" ${item.jenis === 0 ? 'checked' : ''}></center></td>
+                                <td><center><input type="radio" class="form-radio" name="${item.nama}" value="1" ${item.jenis === 1 ? 'checked' : ''}></center></td>
+                                
+                            </tr>
+                        `);
+                    });
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+            //   document.getElementById('criteriaTable').deleteField(0);
               // Get the number of criteria
                 
               var numberInput = document.getElementById("criteriaNumber");
               numberInput.addEventListener("keydown", function(event) {
                 if (event.key === "Tab") {
+                    document.getElementById('criteriaTable').classList.remove('hidden');
                     const criteriaNumber = parseInt(document.getElementById('criteriaNumber').value);
                     const tableBody = document.querySelector('#criteriaTable tbody');
                     tableBody.innerHTML = '';
@@ -245,61 +275,125 @@
             });
 
             document.getElementById('openModalAlternatif').addEventListener('click', function() {
-
-              document.getElementById('modalAlternatif').classList.remove('hidden');
+                document.getElementById('modalAlternatif').classList.remove('hidden');
+              document.getElementById('alternatifNumber').value = 0;
+              document.getElementById('alternatifTable').classList.add('hidden');
               // Get the number of criteria
 
-              var numberInput = document.getElementById("alternatifNumber");
-              numberInput.addEventListener("keydown", function(event) {
-                if (event.key === "Tab") {
-                    
-                    document.querySelector('#alternatifTable thead tr').innerHTML='<th>Nama</th> <th>Deskripsi</th>';
-                    
-                fetch('{{ route("getCriteriaa") }}')
-                    .then(response => response.json())
-                    .then(criteriaNames => {
-                        const criteriaTable = document.getElementById('alternatifTable');
-                        const headerRow = criteriaTable.querySelector('thead tr');
-                
-                        criteriaNames.forEach(name => {
-                            const th = document.createElement('th');
-                            th.textContent = name;
-                            headerRow.appendChild(th);
-                        });
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+              $.ajax({
+                type: "GET",
+                url: '{{ route('getScore') }}', // Ganti dengan endpoint yang sesuai
+                success: function (response) {
+                    // Loop melalui data criteria dan tambahkan ke dalam tabel
+                        if(response.countScore = 0){
 
-                    const alternatifNumber = parseInt(document.getElementById('alternatifNumber').value);
-                    const tableBody = document.querySelector('#alternatifTable tbody');
-                    tableBody.innerHTML = '';
-                    for (let i = 0; i < alternatifNumber; i++) {
+                        }else{
+                            const tableHead = document.querySelector('#alternatifTable thead tr');
+                            tableHead.innerHTML = '<th>Nama</th> <th>Deskripsi</th>';
+                            
+                            const tableBody = document.querySelector('#alternatifTable tbody');
+                            tableBody.innerHTML = '';
+
+                        response.criteria.forEach(function (item) {
+                        $('#alternatifTable thead tr').append(`                            
+                                <th>${item.nama}</th>                            
+                        `);
+                        });
+
+                        response.alternatif.forEach(function (item) {
+                        // var criteriaNumberInput = document.getElementById("criteriaNumber");
+                        // criteriaNumberInput.disabled = true;
+                        // document.querySelector('#alternatifTable tbody').innerHTML += '<tr>';
+                        // $('#alternatifTable tbody').append(`
+                        //         <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
+                        //         <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md" value="${item.deskripsi}"></td>
+                        // `);
+
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                        <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="A${i+1}"></td>
-                        <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md"></td>
+                            <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
+                            <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md" value="${item.deskripsi}"></td>
                         `;
-                        
-                        fetch('{{ route("getCriteriaa") }}')
-                        .then(response => response.json())
-                        .then(criteriaNames => {
-                            criteriaNames.forEach(name => {
-                                row.innerHTML += `
-                                 <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" data-criteria="${name}"></td>
-                             `;
-                            });
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
 
+                        response.score.forEach(function (item2) {
+                            var alternatifNumberInput = document.getElementById("alternatifNumber");
+                            alternatifNumberInput.disabled = true;
+                            document.getElementById('alternatifTable').classList.remove('hidden');
+                            if (item2.alternatif === item.nama) {
+                                // $('#alternatifTable tbody').append(`
+                                //     <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" value="${item2.score}"></td>
+                                // `);
+                                row.innerHTML += `
+                                    <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" data-criteria="${item2.criteria}" value="${item2.score}"></td>
+                                `;
+                            }
+                        });
                         tableBody.appendChild(row);
+                        // document.querySelector('#alternatifTable tbody').innerHTML += '</tr>';
+                        });
                     }
+                },
+                error: function (error) {
+                    console.log(error);
                 }
-                });
-              
             });
+
+              var numberInput = document.getElementById("alternatifNumber");
+              // Fetch criteria names only once
+let criteriaNames;
+
+fetch('{{ route("getCriteriaa") }}')
+    .then(response => response.json())
+    .then(data => {
+        criteriaNames = data;
+
+        // Add headers based on the fetched criteria names
+        const criteriaTable = document.getElementById('alternatifTable');
+        const headerRow = criteriaTable.querySelector('thead tr');
+
+        headerRow.innerHTML = '<th>Nama</th> <th>Deskripsi</th>';
+
+        criteriaNames.forEach(name => {
+            const th = document.createElement('th');
+            th.textContent = name;
+            headerRow.appendChild(th);
+        });
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+// Event listener for Tab key press
+numberInput.addEventListener("keydown", function (event) {
+    if (event.key === "Tab") {
+        document.getElementById('alternatifTable').classList.remove('hidden');
+
+        const alternatifNumber = parseInt(document.getElementById('alternatifNumber').value);
+        const tableBody = document.querySelector('#alternatifTable tbody');
+        tableBody.innerHTML = '';
+
+        for (let i = 0; i < alternatifNumber; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="A${i + 1}"></td>
+                <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md"></td>
+            `;
+
+            // Add score input fields based on the fetched criteria names
+            criteriaNames.forEach(name => {
+                row.innerHTML += `
+                    <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" data-criteria="${name}"></td>
+                `;
+            });
+
+            tableBody.appendChild(row);
+        }
+    }
+});
+
+
+                
+                });
         
             document.getElementById('closeModal1').addEventListener('click', function() {
 
@@ -309,91 +403,18 @@
             });
 
             document.getElementById('closeModal2').addEventListener('click', function() {
-
+                const tableBody = document.querySelector('#alternatifTable tbody');
+                tableBody.innerHTML = '';
+                const tableHead = document.querySelector('#alternatifTable thead tr');
+                tableHead.innerHTML = '';
                 document.getElementById('modalAlternatif').classList.add('hidden');
                 // document.getElementById('alternatifNumber').value = '';
                 // document.querySelector('#alternatifTable tbody').innerHTML='';
             });
           </script>
 
-          <!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <script>
     $(document).ready(function() {
-
-        $.ajax({
-                type: "GET",
-                url: '{{ route('getScore') }}', // Ganti dengan endpoint yang sesuai
-                success: function (response) {
-                    // Loop melalui data criteria dan tambahkan ke dalam tabel
-                    response.criteria.forEach(function (item) {
-                        $('#alternatifTable thead tr').append(`                            
-                                <th>${item.nama}</th>                            
-                        `);
-                    });
-
-                    response.alternatif.forEach(function (item) {
-                        var criteriaNumberInput = document.getElementById("criteriaNumber");
-                        criteriaNumberInput.disabled = true;
-                        $('#alternatifTable tbody').append(`
-                            <tr>
-                                <td><input type="text" name="nama2" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
-                                <td><input type="text" name="deskripsi2" class="w-full px-3 py-2 border rounded-md value="${item.deskripsi}""></td>
-                            
-                        `);
-                        
-                $.ajax({
-                    type: "GET",
-                    url: '{{  url('getscoree') }}' + '/' + item.nama,
-                    success: function (response) {
-                        response.score.forEach(function (item) {
-                        $('#alternatifTable thead tr').append(`                            
-                                <th>${item.nama}</th>                            
-                        `);
-                    });
-                    }
-                });
-                        
-                    });
-
-                    // response.score.forEach(function (item) {                        
-                    //     $('#alternatifTable tbody tr').append(`
-                            
-                    //             <td><input type="text" name="score" class="w-full px-3 py-2 border rounded-md" data-criteria="${item.score}"></td>
-                            
-                    //     `);
-                    // });
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
-        
-        $.ajax({
-                type: "GET",
-                url: '{{ route('getCriteria') }}', // Ganti dengan endpoint yang sesuai
-                success: function (response) {
-                    // Loop melalui data criteria dan tambahkan ke dalam tabel
-                    response.criteriaNames.forEach(function (item) {
-                        var criteriaNumberInput = document.getElementById("criteriaNumber");
-                        criteriaNumberInput.disabled = true;
-                        $('#criteriaTable tbody').append(`
-                            <tr>
-                                <td><input type="text" name="nama" class="w-full px-3 py-2 border rounded-md" value="${item.nama}"></td>
-                                <td><input type="text" name="bobot" class="w-full px-3 py-2 border rounded-md" value="${item.bobot}"></td>
-                                <td><input type="text" name="deskripsi" class="w-full px-3 py-2 border rounded-md" value="${item.deskripsi !== null ? item.deskripsi : ''}"></td>
-                                <td><center><input type="radio" class="form-radio" name="${item.nama}" value="${item.jenis}" ${item.jenis === 0 ? 'checked' : ''}></center></td>
-                                <td><center><input type="radio" class="form-radio" name="${item.nama}" value="${item.jenis}" ${item.jenis === 1 ? 'checked' : ''}></center></td>
-                                
-                            </tr>
-                        `);
-                    });
-                },
-                error: function (error) {
-                    console.log(error);
-                }
-            });
 
         $('#simpan').click(function(e) {
             e.preventDefault();
@@ -410,7 +431,7 @@
                     nama: $(this).find('input[name="nama"]').val(),
                     bobot: $(this).find('input[name="bobot"]').val(),
                     deskripsi: $(this).find('input[name="deskripsi"]').val(),
-                    jenis: $(this).find('input[name^="C"]:checked').val() || 3,
+                    jenis: $(this).find('input[name^="C"]:checked').val(),
                 };
                 formData.criteriaData.push(rowData);
             });
@@ -423,12 +444,14 @@
                 dataType: 'json',
                 success: function(data) {
                     // Handle success (e.g., show a success message)
-                    console.log(data.message);
+                    alert(data.message);
+                    document.getElementById('modalCriteria').classList.add('hidden');
+                    $('#criteriaTable tbody').empty();
                     // Optionally, close the modal or perform other actions
                 },
                 error: function(error) {
                     // Handle errors (e.g., show an error message)
-                    console.error('Error saving criteria:', error);
+                    alert('Error saving criteria:', error);
                 }
             });
         });
@@ -474,7 +497,9 @@
                 dataType: 'json',
                 success: function(data) {
                     // Handle success (e.g., show a success message)
-                    console.log(data.message);
+                    alert(data.message);
+                    document.getElementById('modalAlternatif').classList.add('hidden');
+                    $('#alternatifTable tbody').empty();
                     // Optionally, close the modal or perform other actions
                 },
                 error: function(error) {

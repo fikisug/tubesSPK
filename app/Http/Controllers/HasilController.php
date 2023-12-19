@@ -83,10 +83,10 @@ class HasilController extends Controller
             $totCost = 0;
             foreach ($criteria as $crt) {
                 // dd($criteria);
-                if ($crt['jenis'] === '0') {
+                if ($crt['jenis'] === 0) {
                     $totBen += $normalisasiTerbobot[$crt['jenis']][$crt['nama']][$alt['nama']];
                 }
-                if ($crt['jenis'] === '1') {
+                if ($crt['jenis'] === 1) {
                     $totCost += $normalisasiTerbobot[$crt['jenis']][$crt['nama']][$alt['nama']];
                 }
             }
