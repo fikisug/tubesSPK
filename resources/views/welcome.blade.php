@@ -418,7 +418,8 @@ numberInput.addEventListener("keydown", function (event) {
                 });
         
             document.getElementById('closeModal1').addEventListener('click', function() {
-
+                const tableBody = document.querySelector('#criteriaTable tbody');
+                tableBody.innerHTML = '';
                 document.getElementById('modalCriteria').classList.add('hidden');
                 // document.getElementById('criteriaNumber').value = '';
                 // document.querySelector('#criteriaTable tbody').innerHTML='';
