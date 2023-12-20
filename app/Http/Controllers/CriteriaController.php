@@ -6,6 +6,7 @@ use App\Models\Alternatif;
 use App\Models\Criteria;
 use App\Models\Score;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CriteriaController extends Controller
 {
@@ -123,5 +124,22 @@ class CriteriaController extends Controller
         $score = Score::all()->where('alternatif', $alternatif)->toArray();
         // dd($score);
         return response()->json(['score' => $score]);
+    }
+
+    public function deleteData(){
+        $countCriteria = Criteria::count();
+        if($countCriteria > 0){
+            try {
+                DB::table('criteria')->truncate();
+                DB::table('alternatif')->truncate();
+                DB::table('score')->truncate();
+                return response()->json(['message' => 'Tabel berhasil di-reset']);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            }
+        }else{
+            return response()->json(['message' => 'Data Sudah Kosong']);
+        }
+        
     }
 }

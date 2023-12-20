@@ -29,6 +29,9 @@ Route::get('/criteria-names', [CriteriaController::class, 'getCriteria'])->name(
 Route::get('/criteria-nama', [CriteriaController::class, 'getCriteriaa'])->name('getCriteriaa');
 
 Route::get('/score', [CriteriaController::class, 'getScore'])->name('getScore');
+
+Route::get('/reset', [CriteriaController::class, 'deleteData'])->name('deleteData');
+
 Route::get('/scoree/{alternatif}', [CriteriaController::class, 'getScoree'])->name('getScoree');
 
 // Route::resource('hasil', HasilController::class);
